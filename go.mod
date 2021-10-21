@@ -13,4 +13,5 @@ require (
 	github.com/icexin/gocraft-server v0.0.0-20200316021447-c466fe50ae44
 	github.com/ojrac/opensimplex-go v1.0.1
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/sheenobu/go-obj/obj v0.0.0-20190106231111-fb5ef7341b74 // indirect
 )
