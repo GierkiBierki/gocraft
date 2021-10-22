@@ -6,6 +6,10 @@ require (
 	github.com/boltdb/bolt v1.3.1
 	github.com/faiface/glhf v0.0.0-20181018222622-82a6317ac380
 	github.com/faiface/mainthread v0.0.0-20171120011319-8b78f0a41ae3
+	github.com/fogleman/fauxgl v0.0.0-20200818143847-27cddc103802 // indirect
+	github.com/fogleman/meshview v0.0.0-20210121004855-1de7f8b3301a // indirect
+	github.com/fogleman/simplify v0.0.0-20170216171241-d32f302d5046 // indirect
+	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-gl/gl v0.0.0-20190320180904-bf2b1f2f34d7
 	github.com/go-gl/glfw v0.0.0-20200222043503-6f7a984d4dc4
 	github.com/go-gl/mathgl v0.0.0-20190713194549-592312d8590a
