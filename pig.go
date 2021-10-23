@@ -7,16 +7,23 @@ import (
 	"github.com/faiface/mainthread"
 	"github.com/gierkibierki/gocraft/meshview"
 	"github.com/go-gl/gl/v3.3-core/gl"
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 type Entity struct {
 	pos Vec3
 	mesh *Mesh
+	shader *glhf.Shader
 }
 
 func (e *Entity) Draw()  {
 	fmt.Printf("Rysuje swinie...")
+// 	GLint model = glGetUniformLocation(shaderProgram, "Model" );
+// 3   glUniformMatrix4fv(model, 1, GL_FALSE, glm::value_ptr(Model));
+    e.shader.Begin()
+	e.shader.SetUniformAttr(0, mgl32.Translate3D(0.0, 100.0, 0.0))
 	e.mesh.Draw()
+	e.shader.End()
 }
 
 func ZaladujSwinke(initialPos Vec3) *Entity {
@@ -41,9 +48,10 @@ func ZaladujSwinke(initialPos Vec3) *Entity {
 	mainthread.Call(func() {
 		shader, err = glhf.NewShader(glhf.AttrFormat{
 			glhf.Attr{Name: "pos", Type: glhf.Vec3},
-			// glhf.Attr{Name: "tex", Type: glhf.Vec2},
+			// glhf.Attr{Name: "trans", Type: glhf.Vec2},
 			// glhf.Attr{Name: "normal", Type: glhf.Vec3},
 		}, glhf.AttrFormat{
+			glhf.Attr{ Name: "trans", Type: glhf.Mat4 },
 			// glhf.Attr{Name: "frag_colour", Type: glhf.Vec4},
 		}, vertexShaderSource, fragmentShaderSource)
 		
@@ -56,6 +64,7 @@ func ZaladujSwinke(initialPos Vec3) *Entity {
 		}
 
 		swinka.mesh = NewMesh(shader, meshData.Buffer)
+		swinka.shader = shader;
 	})
 
 
@@ -68,8 +77,10 @@ const (
 
 		in vec3 pos;
 
+		uniform mat4 trans;
+
 		void main() {
-			gl_Position = vec4(pos, 1.0);
+			gl_Position = trans * vec4(pos, 1.0);
 		}
 	` + "\x00"
 
