@@ -19,8 +19,9 @@ type Entity struct {
 func (e *Entity) Draw(g *Game)  {
     e.shader.Begin()
 	s := g.camera.State();
-	fmt.Println("Rysuje swinie", s.X, s.Y, s.Z)
-	e.shader.SetUniformAttr(0, mgl32.Translate3D(s.X, s.Y + 10, s.Z))
+	fmt.Printf("Rysuje swinie %.f %.f %.f \n", s.X, s.Y, s.Z)
+	// proj := mgl32.Translate3D(s.X +3, s.Y, s.Z +3).Mul4(mgl32.Scale3D(10, 10, 10))
+	e.shader.SetUniformAttr(0, mgl32.Scale3D(10, 10, 10))
 	e.mesh.Draw()
 	e.shader.End()
 }
@@ -87,7 +88,7 @@ const (
 		#version 330 core
 		out vec4 frag_colour;
 		void main() {
-			frag_colour = vec4(1, 1, 1, 1.0);
+			frag_colour = vec4(1, 0, 0, 1);
 		}
 	` + "\x00"
 )
