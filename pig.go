@@ -20,21 +20,28 @@ func (e *Entity) Draw()  {
 	e.mesh.Draw()
 }
 
-func ZaladujSwinke(initialPos Vec3) Entity {
+func ZaladujSwinke(initialPos Vec3) *Entity {
 	path := "./assets/pig/Pig.obj"
+	var err error;
+
 	meshData, err := meshview.LoadMesh(path)
 	if err != nil {
 		fmt.Println("Error przy ladowaniu swini", err)
 		panic(err)
 	}
 
-	var mesh *Mesh;
+	var shader *glhf.Shader;
 
-	fmt.Println("Shader dla swini tworze")
+	fmt.Println("Shader dla swini tworze", len(meshData.Buffer), len(meshData.Buffer) / 4)
+
+
+	swinka := &Entity {
+		pos: initialPos,
+	}
 
 	mainthread.Call(func() {
-		shader, err := glhf.NewShader(glhf.AttrFormat{
-			glhf.Attr{Name: "pos", Type: glhf.Vec4},
+		shader, err = glhf.NewShader(glhf.AttrFormat{
+			glhf.Attr{Name: "pos", Type: glhf.Vec3},
 			// glhf.Attr{Name: "tex", Type: glhf.Vec2},
 			// glhf.Attr{Name: "normal", Type: glhf.Vec3},
 		}, glhf.AttrFormat{
@@ -49,15 +56,33 @@ func ZaladujSwinke(initialPos Vec3) Entity {
 			panic(err)
 		}
 
-		mesh = NewMesh(shader, meshData.Buffer)
+		swinka.mesh = NewMesh(shader, meshData.Buffer)
 	})
 
 
-	return Entity {
-		pos: initialPos,
-		mesh: mesh,
-	};
+	return swinka
 }
+
+const (
+	vertexShaderSource = `
+		#version 330 core
+
+		in vec3 pos;
+
+		void main() {
+			gl_Position = vec4(pos, 1.0);
+		}
+	` + "\x00"
+
+	fragmentShaderSource = `
+		#version 330 core
+		out vec4 frag_colour;
+		void main() {
+			frag_colour = vec4(1, 1, 1, 1.0);
+		}
+	` + "\x00"
+)
+
 
 // TODO: move to rendering.go or sth like that
 
@@ -126,23 +151,3 @@ func compileShader(source string, shaderType uint32) (uint32, error) {
 }
 
 
-const (
-	vertexShaderSource = `
-		#version 330 core
-
-		in vec3 pos;
-		in vec3 normal;
-
-		void main() {
-			gl_Position = vec4(pos, 1.0);
-		}
-	` + "\x00"
-
-	fragmentShaderSource = `
-		#version 330 core
-		out vec4 frag_colour;
-		void main() {
-			frag_colour = vec4(1, 1, 1, 1.0);
-		}
-	` + "\x00"
-)

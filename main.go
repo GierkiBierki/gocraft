@@ -28,7 +28,7 @@ var (
 type Game struct {
 	win *glfw.Window
 
-	entities []Entity
+	swinia *Entity
 
 	camera   *Camera
 	lx, ly   float64
@@ -74,10 +74,11 @@ func initGL(w, h int) *glfw.Window {
 	return win
 }
 
-func loadEntities() []Entity {
-	es := make([]Entity, 1) 
-	es = append(es, ZaladujSwinke(Vec3{0, 10, 0}))
-	return es
+func loadEntities(g *Game) {
+	g.swinia = ZaladujSwinke(Vec3{0, 10, 0})
+	// g.entities = *make([]Entity, 1)
+	// append(g.entities, ZaladujSwinke(Vec3{0, 10, 0}))
+	// return es
 }
 
 func NewGame(w, h int) (*Game, error) {
@@ -97,7 +98,7 @@ func NewGame(w, h int) (*Game, error) {
 		game.win = win
 	})
 	game.world = NewWorld()
-	game.entities = loadEntities()
+	loadEntities(game)
 	game.camera = NewCamera(mgl32.Vec3{0, 16, 0})
 	game.blockRender, err = NewBlockRender()
 	if err != nil {
@@ -288,9 +289,10 @@ func (g *Game) Update() {
 		g.blockRender.Draw()
 		g.lineRender.Draw()
 		g.playerRender.Draw()
-		for _, entity := range g.entities {
-			entity.Draw()
-		}
+		g.swinia.Draw()
+		// for _, entity := range g.entities {
+		// 	entity.Draw()
+		// }
 
 		g.renderStat()
 
