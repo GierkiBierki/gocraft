@@ -11,22 +11,21 @@ import (
 )
 
 type Entity struct {
-	pos Vec3
+	pos mgl32.Vec3
 	mesh *Mesh
 	shader *glhf.Shader
 }
 
-func (e *Entity) Draw()  {
-	fmt.Printf("Rysuje swinie...")
-// 	GLint model = glGetUniformLocation(shaderProgram, "Model" );
-// 3   glUniformMatrix4fv(model, 1, GL_FALSE, glm::value_ptr(Model));
+func (e *Entity) Draw(g *Game)  {
     e.shader.Begin()
-	e.shader.SetUniformAttr(0, mgl32.Translate3D(0.0, 100.0, 0.0))
+	s := g.camera.State();
+	fmt.Println("Rysuje swinie", s.X, s.Y, s.Z)
+	e.shader.SetUniformAttr(0, mgl32.Translate3D(s.X, s.Y + 10, s.Z))
 	e.mesh.Draw()
 	e.shader.End()
 }
 
-func ZaladujSwinke(initialPos Vec3) *Entity {
+func ZaladujSwinke(initialPos mgl32.Vec3) *Entity {
 	path := "./assets/pig/Pig.obj"
 	var err error;
 

@@ -75,7 +75,11 @@ func initGL(w, h int) *glfw.Window {
 }
 
 func loadEntities(g *Game) {
-	g.swinia = ZaladujSwinke(Vec3{0, 10, 0})
+	s := g.camera.State();
+	fmt.Println("Laduje swinie", s.X, s.Y, s.Z)
+	g.swinia = ZaladujSwinke(mgl32.Vec3{
+		s.X, s.Y + 10, s.Z,
+	})
 	// g.entities = *make([]Entity, 1)
 	// append(g.entities, ZaladujSwinke(Vec3{0, 10, 0}))
 	// return es
@@ -98,7 +102,6 @@ func NewGame(w, h int) (*Game, error) {
 		game.win = win
 	})
 	game.world = NewWorld()
-	loadEntities(game)
 	game.camera = NewCamera(mgl32.Vec3{0, 16, 0})
 	game.blockRender, err = NewBlockRender()
 	if err != nil {
@@ -115,6 +118,7 @@ func NewGame(w, h int) (*Game, error) {
 	if err != nil {
 		return nil, err
 	}
+	loadEntities(game)
 	go game.blockRender.UpdateLoop()
 	go game.syncPlayerLoop()
 	return game, nil
@@ -289,7 +293,7 @@ func (g *Game) Update() {
 		g.blockRender.Draw()
 		g.lineRender.Draw()
 		g.playerRender.Draw()
-		g.swinia.Draw()
+		g.swinia.Draw(g)
 		// for _, entity := range g.entities {
 		// 	entity.Draw()
 		// }
