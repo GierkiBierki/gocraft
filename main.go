@@ -220,6 +220,10 @@ func (g *Game) handleKeyInput(dt float64) {
 	if g.win.GetKey(glfw.KeyEscape) == glfw.Press {
 		g.setExclusiveMouse(false)
 	}
+	if g.win.GetKey(glfw.KeyX) == glfw.Press {
+		g.camera.flying = true;
+		g.camera.SetPos(mgl32.Vec3 { 0, 0, 0})
+	}
 	if g.win.GetKey(glfw.KeyW) == glfw.Press {
 		g.camera.OnMoveChange(MoveForward, speed)
 	}
