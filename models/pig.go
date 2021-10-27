@@ -1,28 +1,29 @@
-package main
+package models
 
 import (
 	"fmt"
 
 	"github.com/faiface/glhf"
 	"github.com/faiface/mainthread"
+	"github.com/gierkibierki/gocraft/mesh"
 	"github.com/gierkibierki/gocraft/meshview"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
 type Entity struct {
 	pos mgl32.Vec3
-	mesh *Mesh
+	mesh *mesh.Mesh
 	shader *glhf.Shader
 }
 
-func (e *Entity) Draw(g *Game)  {
-    // e.shader.Begin()
+func (e *Entity) Draw()  {
+    e.shader.Begin()
 	// s := g.camera.State();
 	// fmt.Printf("Rysuje swinie %.f %.f %.f \n", s.X, s.Y, s.Z)
-	// // proj := mgl32.Translate3D(s.X +3, s.Y, s.Z +3).Mul4(mgl32.Scale3D(10, 10, 10))
-	// e.shader.SetUniformAttr(0, mgl32.Scale3D(10, 10, 10))
-	// e.mesh.Draw()
-	// e.shader.End()
+	// proj := mgl32.Translate3D(s.X +3, s.Y, s.Z +3).Mul4(mgl32.Scale3D(10, 10, 10))
+	e.shader.SetUniformAttr(0, mgl32.Scale3D(10, 10, 10))
+	e.mesh.Draw()
+	e.shader.End()
 }
 
 func ZaladujSwinke(initialPos mgl32.Vec3) *Entity {
@@ -62,7 +63,7 @@ func ZaladujSwinke(initialPos mgl32.Vec3) *Entity {
 			panic(err)
 		}
 
-		swinka.mesh = NewMesh(shader, meshData.Buffer)
+		swinka.mesh = mesh.NewMesh(shader, meshData.Buffer)
 		swinka.shader = shader;
 	})
 

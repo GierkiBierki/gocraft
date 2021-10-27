@@ -11,6 +11,7 @@ import (
 
 	"github.com/faiface/glhf"
 	"github.com/faiface/mainthread"
+	"github.com/gierkibierki/gocraft/mesh"
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 )
@@ -46,7 +47,7 @@ type BlockRender struct {
 
 	stat Stat
 
-	item *Mesh
+	item *mesh.Mesh
 }
 
 func NewBlockRender() (*BlockRender, error) {
@@ -91,7 +92,7 @@ func NewBlockRender() (*BlockRender, error) {
 	return r, nil
 }
 
-func (r *BlockRender) makeChunkMesh(c *Chunk, onmainthread bool) *Mesh {
+func (r *BlockRender) makeChunkMesh(c *Chunk, onmainthread bool) *mesh.Mesh {
 	facedata := r.facePool.Get().([]float32)
 	defer r.facePool.Put(facedata[:0])
 
@@ -115,12 +116,12 @@ func (r *BlockRender) makeChunkMesh(c *Chunk, onmainthread bool) *Mesh {
 	})
 	n := len(facedata) / (r.shader.VertexFormat().Size() / 4)
 	log.Printf("chunk faces:%d", n/6)
-	var mesh *Mesh
+	var mesh *mesh.Mesh
 	if onmainthread {
-		mesh = NewMesh(r.shader, facedata)
+		mesh = mesh.NewMesh(r.shader, facedata)
 	} else {
 		mainthread.Call(func() {
-			mesh = NewMesh(r.shader, facedata)
+			mesh = mesh.NewMesh(r.shader, facedata)
 		})
 	}
 	mesh.Id = c.Id()
@@ -421,77 +422,6 @@ type Stat struct {
 func (r *BlockRender) Stat() Stat {
 	return r.stat
 }
-
-type Mesh struct {
-	vao, vbo uint32
-	faces    int
-	Id       Vec3
-	Dirty    bool
-}
-
-func NewMesh(shader *glhf.Shader, data []float32) *Mesh {
-	m := new(Mesh)
-	m.faces = len(data) / (shader.VertexFormat().Size() / 4) / 6
-	if m.faces == 0 {
-		return m
-	}
-	gl.GenVertexArrays(1, &m.vao)
-	gl.GenBuffers(1, &m.vbo)
-	gl.BindVertexArray(m.vao)
-	gl.BindBuffer(gl.ARRAY_BUFFER, m.vbo)
-	gl.BufferData(gl.ARRAY_BUFFER, len(data)*4, gl.Ptr(data), gl.STATIC_DRAW)
-
-	offset := 0
-	for _, attr := range shader.VertexFormat() {
-		loc := gl.GetAttribLocation(shader.ID(), gl.Str(attr.Name+"\x00"))
-		var size int32
-		switch attr.Type {
-		case glhf.Float:
-			size = 1
-		case glhf.Vec2:
-			size = 2
-		case glhf.Vec3:
-			size = 3
-		case glhf.Vec4:
-			size = 4
-		}
-		gl.VertexAttribPointer(
-			uint32(loc),
-			size,
-			gl.FLOAT,
-			false,
-			int32(shader.VertexFormat().Size()),
-			gl.PtrOffset(offset),
-		)
-		gl.EnableVertexAttribArray(uint32(loc))
-		offset += attr.Type.Size()
-	}
-	gl.BindVertexArray(0)
-	gl.BindBuffer(gl.ARRAY_BUFFER, 0)
-	return m
-}
-
-func (m *Mesh) Faces() int {
-	return m.faces
-}
-
-func (m *Mesh) Draw() {
-	if m.vao != 0 {
-		gl.BindVertexArray(m.vao)
-		gl.DrawArrays(gl.TRIANGLES, 0, int32(m.faces)*6)
-		gl.BindVertexArray(0)
-	}
-}
-
-func (m *Mesh) Release() {
-	if m.vao != 0 {
-		gl.DeleteVertexArrays(1, &m.vao)
-		gl.DeleteBuffers(1, &m.vbo)
-		m.vao = 0
-		m.vbo = 0
-	}
-}
-
 type Lines struct {
 	vao, vbo uint32
 	shader   *glhf.Shader

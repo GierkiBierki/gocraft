@@ -8,10 +8,10 @@ import (
 
 	_ "image/png"
 
-	"net/http"
 	_ "net/http/pprof"
 
 	"github.com/faiface/mainthread"
+	"github.com/gierkibierki/gocraft/models"
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/go-gl/mathgl/mgl32"
@@ -28,7 +28,7 @@ var (
 type Game struct {
 	win *glfw.Window
 
-	swinia *Entity
+	swinia *models.Entity
 
 	camera   *Camera
 	lx, ly   float64
@@ -77,7 +77,7 @@ func initGL(w, h int) *glfw.Window {
 func loadEntities(g *Game) {
 	s := g.camera.State();
 	fmt.Println("Laduje swinie", s.X, s.Y, s.Z)
-	g.swinia = ZaladujSwinke(mgl32.Vec3{
+	g.swinia = models.ZaladujSwinke(mgl32.Vec3{
 		s.X, s.Y + 10, s.Z,
 	})
 	// g.entities = *make([]Entity, 1)
@@ -297,7 +297,7 @@ func (g *Game) Update() {
 		g.blockRender.Draw()
 		g.lineRender.Draw()
 		g.playerRender.Draw()
-		g.swinia.Draw(g)
+		// g.swinia.Draw(g)
 		// for _, entity := range g.entities {
 		// 	entity.Draw()
 		// }
@@ -365,13 +365,13 @@ func run() {
 	store.UpdatePlayerState(game.camera.State())
 }
 
-func main() {
-	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
-	flag.Parse()
-	go func() {
-		if *pprofPort != "" {
-			log.Fatal(http.ListenAndServe(*pprofPort, nil))
-		}
-	}()
-	mainthread.Run(run)
-}
+// func main() {
+// 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+// 	flag.Parse()
+// 	go func() {
+// 		if *pprofPort != "" {
+// 			log.Fatal(http.ListenAndServe(*pprofPort, nil))
+// 		}
+// 	}()
+// 	mainthread.Run(run)
+// }
