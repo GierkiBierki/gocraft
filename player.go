@@ -5,6 +5,7 @@ import (
 
 	"github.com/faiface/glhf"
 	"github.com/faiface/mainthread"
+	"github.com/gierkibierki/gocraft/mesh"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/icexin/gocraft-server/proto"
@@ -24,7 +25,7 @@ type Player struct {
 	s1, s2 playerState
 
 	shader *glhf.Shader
-	mesh   *Mesh
+	mesh   *mesh.Mesh
 }
 
 // 线性插值计算玩家位置
@@ -121,13 +122,13 @@ func (r *PlayerRender) UpdateOrAdd(id int32, s proto.PlayerState) {
 	if !ok {
 		log.Printf("add new player %d", id)
 		cubeData := makeCubeData([]float32{}, [...]bool{true, true, true, true, true, true}, Vec3{0, 0, 0}, tex.Texture(64))
-		var mesh *Mesh
+		var mymesh *mesh.Mesh
 		mainthread.Call(func() {
-			mesh = NewMesh(r.shader, cubeData)
+			mymesh = mesh.NewMesh(r.shader, cubeData)
 		})
 		p = &Player{
 			shader: r.shader,
-			mesh:   mesh,
+			mesh:   mymesh,
 		}
 		r.players[id] = p
 		p.s1 = state

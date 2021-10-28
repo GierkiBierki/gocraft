@@ -12,9 +12,11 @@ import (
 	"github.com/faiface/glhf"
 	"github.com/faiface/mainthread"
 	"github.com/gierkibierki/gocraft/mesh"
+	m "github.com/gierkibierki/gocraft/mesh"
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 )
+
 
 var (
 	texturePath  = flag.String("t", "texture.png", "texture file")
@@ -47,7 +49,7 @@ type BlockRender struct {
 
 	stat Stat
 
-	item *mesh.Mesh
+	item *m.Mesh
 }
 
 func NewBlockRender() (*BlockRender, error) {
@@ -92,7 +94,7 @@ func NewBlockRender() (*BlockRender, error) {
 	return r, nil
 }
 
-func (r *BlockRender) makeChunkMesh(c *Chunk, onmainthread bool) *mesh.Mesh {
+func (r *BlockRender) makeChunkMesh(c *Chunk, onmainthread bool) *m.Mesh {
 	facedata := r.facePool.Get().([]float32)
 	defer r.facePool.Put(facedata[:0])
 
@@ -116,15 +118,16 @@ func (r *BlockRender) makeChunkMesh(c *Chunk, onmainthread bool) *mesh.Mesh {
 	})
 	n := len(facedata) / (r.shader.VertexFormat().Size() / 4)
 	log.Printf("chunk faces:%d", n/6)
-	var mesh *mesh.Mesh
+	var mesh *m.Mesh
 	if onmainthread {
-		mesh = mesh.NewMesh(r.shader, facedata)
+		mesh = m.NewMesh(r.shader, facedata)
 	} else {
 		mainthread.Call(func() {
-			mesh = mesh.NewMesh(r.shader, facedata)
+			mesh = m.NewMesh(r.shader, facedata)
 		})
 	}
-	mesh.Id = c.Id()
+	id := c.Id()
+	mesh.Id = m.Vec3 { id.X, id.Y, id.Z }
 	return mesh
 }
 
@@ -140,7 +143,7 @@ func (r *BlockRender) UpdateItem(w int) {
 	} else {
 		vertices = makeCubeData(vertices, show, pos, texture)
 	}
-	item := NewMesh(r.shader, vertices)
+	item := mesh.NewMesh(r.shader, vertices)
 	if r.item != nil {
 		r.item.Release()
 	}
@@ -262,7 +265,7 @@ func (r *BlockRender) updateMeshCache() {
 		if !ok {
 			added = append(added, id)
 		} else {
-			if mesh.(*Mesh).Dirty {
+			if mesh.(*m.Mesh).Dirty {
 				log.Printf("update cache %v", id)
 				added = append(added, id)
 				removed = append(removed, id)
@@ -276,12 +279,12 @@ func (r *BlockRender) updateMeshCache() {
 		added = added[:batchBuildChunk]
 	}
 
-	var removedMesh []*Mesh
+	var removedMesh []*m.Mesh
 	for _, id := range removed {
 		log.Printf("remove cache %v", id)
 		mesh, _ := r.meshcache.Load(id)
 		r.meshcache.Delete(id)
-		removedMesh = append(removedMesh, mesh.(*Mesh))
+		removedMesh = append(removedMesh, mesh.(*m.Mesh))
 	}
 
 	newChunks := game.world.Chunks(added)
@@ -300,14 +303,14 @@ func (r *BlockRender) updateMeshCache() {
 
 // called on mainthread
 func (r *BlockRender) forceChunks(ids []Vec3) {
-	var removedMesh []*Mesh
+	var removedMesh []*m.Mesh
 	chunks := game.world.Chunks(ids)
 	for _, chunk := range chunks {
 		id := chunk.Id()
 		imesh, ok := r.meshcache.Load(id)
-		var mesh *Mesh
+		var mesh *m.Mesh
 		if ok {
-			mesh = imesh.(*Mesh)
+			mesh = imesh.(*m.Mesh)
 		}
 		if ok && !mesh.Dirty {
 			continue
@@ -350,7 +353,7 @@ func (r *BlockRender) DirtyChunk(id Vec3) {
 	if !ok {
 		return
 	}
-	mesh.(*Mesh).Dirty = true
+	mesh.(*m.Mesh).Dirty = true
 }
 
 func (r *BlockRender) UpdateLoop() {
@@ -374,7 +377,7 @@ func (r *BlockRender) drawChunks() {
 	planes := frustumPlanes(&mat)
 	r.stat = Stat{}
 	r.meshcache.Range(func(k, v interface{}) bool {
-		id, mesh := k.(Vec3), v.(*Mesh)
+		id, mesh := k.(Vec3), v.(*m.Mesh)
 		r.stat.CacheChunks++
 		if isChunkVisiable(planes, id) {
 			r.stat.RendingChunks++

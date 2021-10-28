@@ -45,8 +45,7 @@ func LoadModel(initialPos mgl32.Vec3) *Entity {
 		glhf.Attr{Name: "pos", Type: glhf.Vec3},
 	}, glhf.AttrFormat{
 		glhf.Attr{ Name: "trans", Type: glhf.Mat4 },
-	}, vertexShaderSource, fragmentShaderSource)
-	
+	}, vertexShaderSource, fragmentShaderSource)	
 
 	if err != nil {
 		fmt.Println("shader err", err)
@@ -57,6 +56,7 @@ func LoadModel(initialPos mgl32.Vec3) *Entity {
 
 	model.mesh = mesh.NewMesh(shader, meshData.Buffer)
 	model.shader = shader;
+
 
 
 	return model
