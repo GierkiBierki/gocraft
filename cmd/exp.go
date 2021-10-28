@@ -41,29 +41,34 @@ var (
 	}
 )
 
-func run() {
-	var window *glfw.Window;
-
+func initOpenGl(){
 	if err := gl.Init(); err != nil {
 		fmt.Println("OpenGL init")
 		panic(err)
 	}
 	version := gl.GoStr(gl.GetString(gl.VERSION))
 	log.Println("OpenGL version", version)
+}
 
-	var program uint32;
-	var vao uint32;
+func run() {
+	window := initGlfw()
+	initOpenGl();
 
-	window = initGlfw()
-	program = createProgram()
-	vao = makeVao(triangle)
+	// program := createProgram()
+	// vao := makeVao(triangle)
 	defer glfw.Terminate()
 
-	pig := models.LoadModel(mgl32.Vec3{ 0, 0, 0})
+	pig := models.LoadModel(mgl32.Vec3{ 100, 0, 100 })
 
 	for !window.ShouldClose() {
-		draw(vao, window, program)
+		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+	
+		// draw(vao, window, program)
 		pig.Draw()
+
+		glfw.PollEvents()
+		window.SwapBuffers()
+	
 	}	
 }
 
