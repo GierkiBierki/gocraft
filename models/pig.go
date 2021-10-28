@@ -17,8 +17,6 @@ type Entity struct {
 
 func (e *Entity) Draw()  {
     e.shader.Begin()
-	// s := g.camera.State();
-	// fmt.Printf("Rysuje swinie %.f %.f %.f \n", s.X, s.Y, s.Z)
 	proj := mgl32.Translate3D(0, 0, 0).Mul4(mgl32.Scale3D(0.01, 0.01, 0.01))
 	e.shader.SetUniformAttr(0, proj)
 	e.mesh.Draw()
@@ -44,7 +42,7 @@ func LoadModel(initialPos mgl32.Vec3) *Entity {
 
 	fmt.Println("Tu jestem")
 	shader, err = glhf.NewShader(glhf.AttrFormat{
-		glhf.Attr{Name: "pos", Type: glhf.Vec4},
+		glhf.Attr{Name: "pos", Type: glhf.Vec3},
 	}, glhf.AttrFormat{
 		glhf.Attr{ Name: "trans", Type: glhf.Mat4 },
 	}, vertexShaderSource, fragmentShaderSource)
@@ -94,7 +92,7 @@ void main() {
 	vec3 ec_normal = normalize(cross(dFdx(ec_pos), dFdy(ec_pos)));
 	float diffuse = max(0, dot(ec_normal, light_direction)) * 0.9 + 0.15;
 	vec3 color = object_color * diffuse;
-	frag_colour = vec4(color, 1);
+	frag_colour = vec4(1.0, 0.8, 0.8, 1);
 }
 `
 
