@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/fogleman/fauxgl"
-	"github.com/go-gl/gl/v2.1/gl"
+	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
 func setMatrix(location int32, m fauxgl.Matrix) {

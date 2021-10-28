@@ -6,8 +6,10 @@ import (
 	"strings"
 
 	"github.com/faiface/mainthread"
-	"github.com/go-gl/gl/v4.1-core/gl" // OR: github.com/go-gl/gl/v2.1/gl
+	"github.com/gierkibierki/gocraft/models"
+	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 const (
@@ -41,30 +43,34 @@ var (
 
 func run() {
 	var window *glfw.Window;
+
+	if err := gl.Init(); err != nil {
+		fmt.Println("OpenGL init")
+		panic(err)
+	}
+	version := gl.GoStr(gl.GetString(gl.VERSION))
+	log.Println("OpenGL version", version)
+
 	var program uint32;
 	var vao uint32;
-	mainthread.Call(func () {
-		window = initGlfw()
-		program = initOpenGL()
-		vao = makeVao(triangle)
-	})
 
+	window = initGlfw()
+	program = createProgram()
+	vao = makeVao(triangle)
 	defer glfw.Terminate()
-	// var pig *models.Entity;
 
-
-	// pig = models.ZaladujSwinke(mgl32.Vec3{ 0, 0, 0})
+	pig := models.LoadModel(mgl32.Vec3{ 0, 0, 0})
 
 	for !window.ShouldClose() {
-		mainthread.Call(func () {
-			draw(vao, window, program)
-		})
-		// pig.Draw()
+		draw(vao, window, program)
+		pig.Draw()
 	}	
 }
 
 func main(){
-	mainthread.Run(run)
+	mainthread.Run(func() {
+		mainthread.Call(run)
+	})
 }
 
 func draw(vao uint32, window *glfw.Window, program uint32) {
@@ -98,14 +104,8 @@ func initGlfw() *glfw.Window {
 	return window
 }
 
-// initOpenGL initializes OpenGL and returns an intiialized program.
-func initOpenGL() uint32 {
-	if err := gl.Init(); err != nil {
-		panic(err)
-	}
-	version := gl.GoStr(gl.GetString(gl.VERSION))
-	log.Println("OpenGL version", version)
-
+// createProgram initializes OpenGL and returns an intiialized program.
+func createProgram() uint32 {
 	vertexShader, err := compileShader(vertexShaderSource, gl.VERTEX_SHADER)
 	if err != nil {
 		panic(err)

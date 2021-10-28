@@ -2,7 +2,7 @@ package meshview
 
 import (
 	"github.com/fogleman/fauxgl"
-	"github.com/go-gl/gl/v2.1/gl"
+	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
 type MeshData struct {
