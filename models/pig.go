@@ -19,7 +19,7 @@ func (e *Entity) Draw()  {
     e.shader.Begin()
 	// s := g.camera.State();
 	// fmt.Printf("Rysuje swinie %.f %.f %.f \n", s.X, s.Y, s.Z)
-	proj := mgl32.Translate3D(-2, -5, -15.0)
+	proj := mgl32.Translate3D(0, 0, 0).Mul4(mgl32.Scale3D(0.01, 0.01, 0.01))
 	e.shader.SetUniformAttr(0, proj)
 	e.mesh.Draw()
 	e.shader.End()
