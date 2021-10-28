@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	width  = 500
-	height = 500
+	width  = 1080
+	height = 900
 
 	vertexShaderSource = `
 		#version 410
